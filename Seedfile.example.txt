@@ -1,0 +1,2 @@
+get github.com/logicminds/puppet-retrospec, ref: master
+get github.com/logicminds/micro-puppet, ref: master
