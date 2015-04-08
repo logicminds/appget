@@ -8,19 +8,18 @@ import "bufio"
 import "github.com/logicminds/tools/go/vcs"
 import "path"
 
-func Sync_Seed_File(dest_path string, seed_file string) {
+func Sync_Seed_File(dest_path string, seed_file string) (repo_dirs []string) {
     file, err := os.Open(seed_file)
     if err != nil {
         log.Fatal(err)
     }
     defer file.Close()
-
     scanner := bufio.NewScanner(file)
     for scanner.Scan() {
         repo_path, repo_ref := find_repo(scanner.Text())
         template_path := path.Join(dest_path, repo_path)
         var err error
-
+        repo_dirs = append(repo_dirs, template_path)
         log.Printf("Fetching %s...\n", repo_path)
         vcs_cmd, _, err := vcs.FromDir(template_path, dest_path)
         // repo must not exist yet
@@ -44,6 +43,7 @@ func Sync_Seed_File(dest_path string, seed_file string) {
     if err := scanner.Err(); err != nil {
         log.Fatal(err)
     }
+    return repo_dirs
 }
 // this is short term solution to having a full blown lexer to parse a seed file
 func find_repo(input string) (repo_url string, branch string) {
